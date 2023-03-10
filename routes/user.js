@@ -6,6 +6,8 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const nodemailer =require('nodemailer');
 require('dotenv').config();
+var auth = require('../services/authentication');
+var checkRole = require('../services/checkRole');
 
 router.post('/signup',(req,res) =>{
     let user = req.body;
@@ -97,6 +99,40 @@ router.post('/forgotPassword',(req,res)=>{
             return res.status(500).json(err);
         }
     })
+})
+
+router.get('/get',auth.authenticateToken,(req,res)=>{
+    var query ="select id,name,email,contactNumber,status from user where role='user'";
+    connection.query(query,(err,results)=>{
+        if(!err){
+            return res.status(200).json(results);
+        }
+        else{
+            return res.status(500).json(err);
+        }
+    })
+})
+
+router.patch('/update',auth.authenticateToken,(req,res)=>{
+    let user = req.body;
+    var query = "update user status=? where id=?";
+    connection.query(query,[user.status,user.id],(err,results)=>{
+        if(!err){
+            if(results.affectedRows == 0){
+                return res.status(404).json({message:"User id does not exits"});
+            }
+            return res.status(200).json({message:"User Updated Successfully"});
+        }
+        else{
+            return res.status(500).json(err);
+        }
+    })
+})
+router.get('/checkToken',auth.authenticateToken,(req,res)=>{
+    return res.status(200).json({message:"true"});
+})
+router.post('/changePassword',(req,res)=>{
+
 })
 
 module.exports = router;
