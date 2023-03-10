@@ -66,7 +66,7 @@ var transporter = nodemailer.createTransport({
         pass: process.env.PASSWORD
     }
 })
-router.post('/forgotpassword',(req,res)=>{
+router.post('/forgotPassword',(req,res)=>{
     const user = req.body;
     query = "select email, password from user where email=?";
     connection.query(query,[user.email],(err,results)=>{
